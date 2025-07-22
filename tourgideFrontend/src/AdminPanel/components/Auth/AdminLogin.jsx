@@ -1,17 +1,19 @@
 
-import { LogIn } from 'lucide-react'; 
+import { LogIn, LogOutIcon } from 'lucide-react'; 
 import { useContext, useEffect, useState } from 'react';
 import './AdminLogin.css'; 
 import axios from 'axios';
 import { StoreContext } from '../../../context/StoreContext'; 
+import { useNavigate } from 'react-router-dom';
 
-const AdminLogin = ({ setAdminToken }) => {
+const AdminLogin = ({ setAdminToken, onNavigate, showlogin,setShowLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showlogin, setShowLogin] = useState(true);
-  const {url} = useContext(StoreContext)
+  
+  const {url, setCurrentPage} = useContext(StoreContext)
  
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,7 +74,7 @@ const AdminLogin = ({ setAdminToken }) => {
   return (
     <div className={showlogin ? "admin-login min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4" : "admin-login-hide"}>
        <div className="bg-white p-8 rounded-2xl shadow-3xl w-full max-w-md transform transition-all duration-500 hover:scale-[1.01] border border-gray-100">
-        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Admin Login</h2>
+       <LogOutIcon size={20} onClick={()=>{localStorage.setItem("currentPage", ""); navigate("/"); setCurrentPage("")}} /> <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Admin Login</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="admin-email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>

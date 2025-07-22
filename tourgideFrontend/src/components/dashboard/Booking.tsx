@@ -38,6 +38,7 @@ const Booking = ({setBooking}) => {
       }); 
 
       setMessage('Booking successful!');
+      setBooking(false)
     } catch (err) {
       setError(`Failed to book: ${err.response?.data?.message || err.message || 'Unknown error'}`);
     } finally {

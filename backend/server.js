@@ -31,7 +31,7 @@ app.use("/api/tours", tourRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/admin", adminAuthRoute);
 app.use("/api/admin/admin-dashboard", adminDashboard) 
-// app.use("/api/swap", swapRequestRoute)
+app.use("/api/swap", verifyToken, swapRequestRoute)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

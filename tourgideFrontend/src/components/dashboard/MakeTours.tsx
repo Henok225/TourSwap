@@ -113,6 +113,14 @@ const MakeTours = ({setMakeTour}) => {
               <input type="text" id="image-url" name="imageUrl" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.imageUrl} onChange={handleChange} required />
             </div>
             <div>
+              <label htmlFor="includes" className="block text-gray-700 text-sm font-medium mb-2">What's included: </label>
+              <input type="text" id="includes" name="includes" placeholder='hotel, transport, ...' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.imageUrl} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="excludes" className="block text-gray-700 text-sm font-medium mb-2">What's excluded: </label>
+              <input type="text" id="excludes" name="excludes" placeholder='dining, shopping, ... ' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.imageUrl} onChange={handleChange} required />
+            </div>
+            <div>
               <label htmlFor="availability" className="block text-gray-700 text-sm font-medium mb-2">Availability:</label>
               <input type="number" id="availability" name="availability" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.availability} onChange={handleChange} min="0" required />
             </div>

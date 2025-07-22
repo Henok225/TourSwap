@@ -1,6 +1,40 @@
 import mongoose from "mongoose";
 import { type } from "os";
 
+const ReviewSchema = new mongoose.Schema({
+  
+  // Reference to the User who wrote the review
+  userId: {
+    type: String, // Use mongoose.Schema.Types.ObjectId if you have a User model
+    required: true,
+    trim: true,
+    // index: true // Index for efficient lookup of reviews by a specific user
+  },
+  // The rating given by the user (e.g., 1 to 5 stars)
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5,
+    message: 'Rating must be between 1 and 5.'
+  },
+  comment: {
+    type: String,
+    trim: true,
+    maxlength: 1000, // Optional: Limit review length
+    default: ''
+  },
+ status: {
+    type: String,
+    enum: ['pending', 'approved', 'flagged'],
+    default: 'approved', // Default to approved, or pending if moderation is strict
+    trim: true 
+  }
+});
+
+//  Compound index to ensure a user can only review a specific tour once
+ReviewSchema.index({ userId: 1 }, { unique: true });
+
 const tourSchema = new mongoose.Schema({
   title: { type: String, required: true },
   location: { type: String, required: true },
@@ -19,10 +53,12 @@ const tourSchema = new mongoose.Schema({
   rating: { type: Number, default: 0, min: 0, max: 5 },
   status: {
     type: String,
-    enum: ["active", "Suspended","Draft", "Pending Review"],
-    default: "active",
+    enum: ["Active", "Suspended","Draft", "Pending Review"],
+    default: "Draft",
   },
   bookings: {type: Number, default: 0},
+  review:{type:ReviewSchema, required:false}
+
 });
 
 export default mongoose.model("Tour", tourSchema);

@@ -73,7 +73,7 @@ const App = () => {
             {!token ? <Route path="/register" element={<RegisterPage  onNavigate={handleNavigate}/>} /> : null}
             <Route path="/traveler-dashboard" element={<TravelerDashboard onNavigate={handleNavigate} />} />
             <Route path="/agency-dashboard" element={<AgencyDashboard onNavigate={handleNavigate} />} />
-            <Route path='/admin' element={<DashboardApp />} /> {/* Admin dashboard route */}
+            <Route path='/admin' element={<DashboardApp onNavigate={handleNavigate} />} /> {/* Admin dashboard route */}
             {/* Fallback route for 404 */}
             <Route path="*" element={<HomePage onNavigate={handleNavigate} />} /> {/* Or a dedicated 404 page */}
           </Routes>

@@ -10,10 +10,10 @@ import AdminLogin from "../components/Auth/AdminLogin";
 
 
 
-const DashboardApp = () => {
+const DashboardApp = ({onNavigate}) => {
     const [currentPage, setCurrentPage] = useState('dashboard'); // Default to Dashboard
     const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null); 
-  
+    const [showlogin, setShowLogin] = useState(true);
 
     
     const handleNavigate = (page) => {
@@ -28,13 +28,13 @@ const DashboardApp = () => {
     const renderPage = () => {
       switch (currentPage) {
         case 'dashboard':
-          return <DashboardOverview />;
+          return <DashboardOverview setShowLogin={setShowLogin} />;
         case 'manage-users':
-          return <ManageUsers />;
+          return <ManageUsers adminToken={adminToken} />;
         case 'manage-listings':
-          return <ManageListings />;
+          return <ManageListings adminToken={adminToken}/>;
         case 'flagged-content':
-          return <ReviewFlaggedContent />;
+          return <ReviewFlaggedContent adminToken={adminToken}/>;
         // case 'logout':
         //   return (
           
@@ -65,12 +65,12 @@ const DashboardApp = () => {
             }
           `}
         </style>
-        <AdminLogin setAdminToken={setAdminToken} />
+        <AdminLogin setAdminToken={setAdminToken} setShowLogin={setShowLogin} showlogin={showlogin} onNavigate={onNavigate} />
 
         {
             adminToken ? 
                 <>
-                <AdminHeader currentPage={currentPage} onNavigate={handleNavigate} />
+                <AdminHeader currentPage={currentPage} onNavigate={handleNavigate} setAdminToken={setAdminToken} />
         
         <main className="flex-grow py-8 container mx-auto" style={{ paddingTop: '80px' }}> {/* Add padding to main content */}
           {renderPage()}

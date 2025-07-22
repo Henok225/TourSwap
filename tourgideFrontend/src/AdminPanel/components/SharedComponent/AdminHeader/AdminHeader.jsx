@@ -1,17 +1,28 @@
 
 import { useEffect, useState } from "react";
-import { Shield, User, List, Flag, Edit, Trash2, Home, LogIn, Search, BarChart2, CheckCircle, XCircle, Briefcase } from 'lucide-react';
+import { Shield, User, List, Flag, Edit, Trash2, Home, LogIn, Search, BarChart2, CheckCircle, XCircle, Briefcase, LogOutIcon } from 'lucide-react';
 import AdminNavLink from "../AdminNavLink/AdminNavLink";
 import LoaderSpin from "../../../../components/loaderSpin/Loader";
 import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "../../ConfirmationModal/ConfirmationModal";
 
 
 
-const AdminHeader = ({ currentPage, onNavigate }) => {
+const AdminHeader = ({ currentPage, onNavigate, setAdminToken }) => {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [loading,setLoading] = useState(false)
     const navigate = useNavigate()
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedFlag, setSelectedFlag] = useState(null);
+    const [modalAction, setModalAction] = useState(''); // 'resolve' or 'dismiss'
+  
+
+    const handleActionClick = (flag) => {
+      setSelectedFlag(flag);
+      // setModalAction(action);
+      setIsModalOpen(true);
+    };
   
     const onLogout = ()=>{
       
@@ -19,9 +30,7 @@ const AdminHeader = ({ currentPage, onNavigate }) => {
             localStorage.removeItem('adminToken'),
             setAdminToken(null)
         navigate('/')
-        
-      
-
+   
     }
 
     useEffect(() => {
@@ -57,10 +66,10 @@ const AdminHeader = ({ currentPage, onNavigate }) => {
                 <AdminNavLink icon={List} label="Listings" page="manage-listings" currentPage={currentPage} onNavigate={onNavigate} />
                 <AdminNavLink icon={Flag} label="Flagged Content" page="flagged-content" currentPage={currentPage} onNavigate={onNavigate} />
                 <button
-            onClick={onLogout}
+            onClick={()=>handleActionClick("logout")}
             className="flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-300 text-sm md:text-base text-white hover:bg-gray-700 hover:text-white font-medium"
           >
-            <LogIn size={18} />
+            <LogOutIcon size={18} />
             <span className="hidden sm:inline">Logout</span>
           </button>
               </nav>
@@ -68,7 +77,13 @@ const AdminHeader = ({ currentPage, onNavigate }) => {
             
           </header>
 
-        
+          <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={onLogout}
+          title={`Logout`}
+          message={`Are you sure you want to logout from your admin pannel`}
+        />
         </>
         
         

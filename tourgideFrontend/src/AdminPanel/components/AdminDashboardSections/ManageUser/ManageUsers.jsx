@@ -7,7 +7,7 @@ import LoaderSpin from "../../../../components/loaderSpin/Loader";
 
 
 
-const ManageUsers = () => {
+const ManageUsers = ({adminToken}) => {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,11 @@ const ManageUsers = () => {
       const getUsers = async () => {
         try {
           setLoading(true)
-           const response = await axios.get(url+'/api/users/'); 
+           const response = await axios.get(url+'/api/users/',{
+            headers:{
+              'Authorization': "Bearer "+adminToken
+            }
+           }); 
          
           if (response.data.success) {
             setUsers(response.data.users);
@@ -54,7 +58,11 @@ const ManageUsers = () => {
       
       try {
         setLoading(true)
-        const responce = await axios.delete(`${url}/api/users/${selectedUser._id}`);
+        const responce = await axios.delete(`${url}/api/users/${selectedUser._id}`,{
+          headers:{
+            'Authorization': "Bearer "+adminToken
+          }
+        });
         if (responce.data.success) {
           setUsers(users.filter(u => u._id !== selectedUser._id));
           setIsModalOpen(false);

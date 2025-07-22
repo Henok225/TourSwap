@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios'; // For conceptual API calls
 import { Star, Loader2, Send, X } from 'lucide-react';
 import { StoreContext } from '../../context/StoreContext';
+import { useNavigate } from 'react-router-dom';
 
 // --- Axios Instance Setup (Conceptual - In a real app, this would be in a separate file) ---
 const api = axios.create({
@@ -53,9 +54,10 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, tour }) => {
       setIsSubmitting(false);
       return;
     }
+    console.log(tour)
 
     try {
-      await onSubmit(tour.id, rating, comment);
+      await onSubmit(tour.tourId._id, rating, comment);
       onClose(); // Close modal on successful submission
     } catch (err) {
       setSubmitError(err.message || 'Failed to submit review. Please try again.');
@@ -132,12 +134,13 @@ const TravelerReviewsSection = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedReviewTour, setSelectedReviewTour] = useState(null);
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' }); // For success/error messages after modal closes
-  const {url,token,userData} = useContext(StoreContext)
+  const {url,token,userData, toReadableDate} = useContext(StoreContext)
     const [bookedTours,setBookedTours] = useState([
       { id: 101, name: 'Paris City Break', date: '2025-09-15', status: 'Confirmed' },
       { id: 102, name: 'Rome Historical Tour', date: '2025-11-20', status: 'Pending' },
       { id: 103, name: 'New York Explorer', date: '2025-08-01', status: 'Completed' },
     ]);
+    const navigate = useNavigate();
     // const [bookingLoad,setBookingLoad] = useState(false)
   
 
@@ -208,21 +211,46 @@ const TravelerReviewsSection = () => {
   };
 
   const handleReviewSubmit = async (tourId, rating, comment) => {
+
+    const api = axios.create({
+      baseURL: url+'/api/tours', // IMPORTANT: Replace with your actual backend API base URL
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer '+token
+      },
+    });
+
+    // Response Interceptor (Crucial for handling token expiration/errors)
+  api.interceptors.response.use(
+  (response) => response, // If the response is successful, just return it
+  (error) => {
+    // Check if the error is due to an HTTP 401 Unauthorized status
+    // This typically indicates an expired or invalid token
+    if (error.response && error.response.status === 403) {
+      console.error('Authentication failed or token expired. Redirecting to login.');
+      localStorage.removeItem('token'); // Delete the expired token from local storage 
+         navigate('/login')
+    }
+    return Promise.reject(error); // Re-throw the error so it can be caught by the calling component
+  }
+);
+
+
     try {
-      console.log(`Submitting review for tour ${tourId}: Rating ${rating}, Comment: "${comment}"`);
-      // In a real app, this would be an API call to your backend
-      // await api.post('/reviews', { tourId, rating, comment });
+     const response =  await api.post('/reviews', { tourId, rating, comment });
+    
+      // success
+      if(response.data.success){
+        setSubmitMessage({ type: 'success', text: `Review for "${selectedReviewTour.tourId.title}" submitted successfully!` });
+        setReviewsToSubmit(prev => prev.filter(tour => tour.tourId._id !== tourId));
 
-      // Simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setSubmitMessage({ type: 'success', text: `Review for "${selectedReviewTour.title}" submitted successfully!` });
-      // Remove the reviewed tour from the list
-      setReviewsToSubmit(prev => prev.filter(tour => tour.id !== tourId));
+      }
 
     } catch (err) {
       console.error('Error submitting review:', err);
-      setSubmitMessage({ type: 'error', text: `Failed to submit review for "${selectedReviewTour.title}".` });
+      setSubmitMessage({ type: 'error', text: `Failed to submit review for "${selectedReviewTour.tourId.title}".` });
       throw new Error('Review submission failed.'); // Re-throw to be caught by modal's handleSubmit
     }
   };
@@ -231,16 +259,7 @@ const TravelerReviewsSection = () => {
     setIsReviewModalOpen(false);
     setSelectedReviewTour(null);
   };
-   // changing the ISO date to regular
-   const toReadableDate = (dateString)=>{
-
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const formated = new Date(dateString).toLocaleDateString('en-US', options);
-
-    return formated;
-
-  }
-
+  
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
      

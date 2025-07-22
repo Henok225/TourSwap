@@ -172,7 +172,7 @@ const AgencyDashboard = ({ onNavigate }) => {
                 {bookingLoad ? recentBookings.map(book => (
                   <li key={book._id} className="bg-gray-50 p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm hover:shadow-md transition duration-200">
                     <div>
-                      <p className="font-medium text-lg text-gray-900">{book.tourId.title}</p>
+                      <p className="font-medium text-lg text-gray-900">{book.tourId ? book.tourId.title:null}</p>
                       <p className="text-sm text-gray-600">Traveler: {book.fullName}</p>
                       {/* <button>Confirm</button> */}
                       <select name="status" 

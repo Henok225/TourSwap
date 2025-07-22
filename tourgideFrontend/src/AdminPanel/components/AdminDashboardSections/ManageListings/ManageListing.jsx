@@ -6,21 +6,28 @@ import { StoreContext } from "../../../../context/StoreContext";
 
 
 
-const ManageListings = () => {
+const ManageListings = ({adminToken}) => {
 
     const {url} = useContext(StoreContext)
     const [listings, setListings] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedListing, setSelectedListing] = useState(null);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false); // New state for status change modal
+    const [statusChangeDetails, setStatusChangeDetails] = useState({ id: null, newStatus: '' });
   
     useEffect(() => {
 
       const fetchListings = async () => {
         try {
-          const response = await axios.get(url+'/api/tours/'); 
+          const response = await axios.get(url+'/api/tours/admin',{
+            headers:{
+              'Authorization': "Bearer "+adminToken
+            }
+          }); 
           if (response.data.success) {
-            setListings(response.data.tours); // Assuming the response contains a 'listings' array
+            setListings(response.data.tours); 
+            console.log(response.data.tours)
           }
           
         } catch (error) {
@@ -31,6 +38,7 @@ const ManageListings = () => {
       fetchListings();
 
     }, []);
+
 
     const filteredListings = listings.filter(listing =>
       listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,6 +56,47 @@ const ManageListings = () => {
       setSelectedListing(null);
       console.log(`Deleted listing: ${selectedListing.name}`);
     };
+
+    // Handler for when status select changes
+  const handleStatusChange = (listingId, newStatus) => {
+    setStatusChangeDetails({ id: listingId, newStatus: newStatus });
+    setIsStatusModalOpen(true);
+  };
+
+  // Confirm status change after modal interaction
+  const confirmStatusChange = async () => {
+    const { id, newStatus } = statusChangeDetails;
+    setListings(prevListings =>
+      prevListings.map(listing =>
+        listing.id === id ? { ...listing, status: newStatus } : listing
+      )
+    );
+    setIsStatusModalOpen(false);
+    setStatusChangeDetails({ id: null, newStatus: '' });
+    //  API call to backend
+    try {
+
+     const response = await axios.put(`${url}/api/tours/update/${id}`, { status: newStatus },{
+      headers:{
+        'Authorization': "Bearer "+adminToken
+      }
+     });
+     if(response.data.success){
+      setStatusChangeDetails({ id:id, newStatus: newStatus });
+      console.log(`Successfully updated status for listing ${id} to ${newStatus}`);
+    
+     }
+      
+    } catch (error) {
+      console.error(`Error updating status for listing ${id}:`, error);
+      // Revert status in UI or show error message if API call fails
+      setListings(prevListings =>
+        prevListings.map(listing =>
+          listing.id === id ? { ...listing, status: listings.find(l => l.id === id).status } : listing
+        )
+      );
+    }
+  };
   
     return (
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -67,7 +116,7 @@ const ManageListings = () => {
         <ul className="space-y-4">
           {filteredListings.length > 0 ? (
             filteredListings.map(listing => (
-              <li key={listing.id} className="bg-gray-50 p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm hover:shadow-md transition duration-200">
+              <li key={listing._id} className="bg-gray-50 p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm hover:shadow-md transition duration-200">
                 <div>
                   <p className="font-medium text-lg text-gray-900">{listing.title}</p>
                   <p className="text-sm text-gray-600">Agency: {listing.providerName}</p>
@@ -78,7 +127,27 @@ const ManageListings = () => {
                     listing.status === 'Pending Review' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {listing.status}
+
+
+                    {/* Status Select Dropdown */}
+                <select
+                  value={listing.status}
+                  onChange={(e) => handleStatusChange(listing._id, e.target.value)}
+                  className={`px-3 py-1 rounded-full text-sm font-semibold border ${
+                    listing.status === 'Active' ? 'bg-green-100 text-green-800 border-green-200' :
+                    listing.status === 'Pending Review' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                    'bg-red-100 text-red-800 border-red-200'
+                  } appearance-none pr-8 bg-white`}
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.2em 1.2em' }}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Pending Review">Pending Review</option>
+                  <option value="Suspended">Suspended</option>
+                  <option value="Draft">Draft</option>
+                </select>
+
+
+
                   </span>
                   <button className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 transition duration-200" title="Edit Listing"><Edit size={20} /></button>
                   <button
@@ -109,6 +178,15 @@ const ManageListings = () => {
           title="Confirm Deletion"
           message={`Are you sure you want to delete listing "${selectedListing?.name}"? This action cannot be undone.`}
         />
+        <ConfirmationModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        onConfirm={confirmStatusChange}
+        title="Confirm Status Change"
+        message={`Are you sure you want to change the status of "${listings.find(l => l.id === statusChangeDetails.id)?.name}" to "${statusChangeDetails.newStatus}"?`}
+        confirmText="Change Status"
+        confirmColor="bg-blue-600"
+      />
       </div>
     );
   };

@@ -10,7 +10,7 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
-    const {userData} = useContext(StoreContext) 
+    const {userData, toReadableDate} = useContext(StoreContext) 
   
     // Reset form when modal opens for a new requested tour
     useEffect(() => {
@@ -32,11 +32,13 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
   
       setIsSubmitting(true);
       try {
-        const offeredTourBooking = myBookedTours.find(b => b.id === selectedOfferedBookingId);
+        const offeredTourBooking = myBookedTours.find(b => b.tourId._id === selectedOfferedBookingId);
         if (!offeredTourBooking) {
+          console.log("Selected offered tour not found in your bookings")
           throw new Error('Selected offered tour not found in your bookings.');
         }
-  
+        
+        
         // Collect all necessary data
         const swapData = {
            requesterId: userData.userId, 
@@ -44,16 +46,16 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
   
           // The tour the requester is offering (from their booked tours)
           offeredTour: {
-            id: offeredTourBooking.tourId, // Assuming booked tour has a tourId reference
-            bookingId: offeredTourBooking.id, // The specific booking ID
-            title: offeredTourBooking.name,
-            date: offeredTourBooking.date,
-            price: offeredTourBooking.price || '$XXX' // Add price to booked tours dummy data if available
+            id: offeredTourBooking.tourId._id, // Assuming booked tour has a tourId reference
+            bookingId: offeredTourBooking._id, // The specific booking ID
+            title: offeredTourBooking.tourId.title,
+            date: offeredTourBooking.updatedAt,
+            price: offeredTourBooking.price || '$XXX' 
           },
           // The tour the requester wants (the one they clicked on)
           requestedTour: {
-            id: requestedTour.id, // The general tour ID from the listing
-            title: requestedTour.name,
+            id: requestedTour._id, // The general tour ID from the listing
+            title: requestedTour.title,
             location: requestedTour.location,
             price: requestedTour.price
           },
@@ -81,11 +83,11 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
           <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition duration-200">
             <X size={24} />
           </button>
-          <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Initiate Swap for "{requestedTour.name}"</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Initiate Swap for "{requestedTour.title}"</h3>
   
           <div className="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-100">
             <p className="text-blue-800 font-semibold text-lg mb-2">You are requesting:</p>
-            <p className="text-blue-700 text-base flex items-center"><MapPin size={18} className="mr-2" /> {requestedTour.name} in {requestedTour.location}</p>
+            <p className="text-blue-700 text-base flex items-center"><MapPin size={18} className="mr-2" /> {requestedTour.title} in {requestedTour.location}</p>
             <p className="text-blue-700 text-base flex items-center"><DollarSign size={18} className="mr-2" /> {requestedTour.price}</p>
           </div>
   
@@ -104,8 +106,8 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
                 <option value="">-- Choose your tour --</option>
                 {myBookedTours.length > 0 ? (
                   myBookedTours.map(tour => (
-                    <option key={tour.id} value={tour.id}>
-                      {tour.name} (Booked: {tour.date})
+                    <option key={tour.tourId._id} value={tour.tourId._id}>
+                      {tour.tourId.title} (Booked: {toReadableDate(tour.updatedAt)})
                     </option>
                   ))
                 ) : (

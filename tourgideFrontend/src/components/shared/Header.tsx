@@ -1,7 +1,7 @@
 // import React from 'react'
 import { useContext, useEffect } from 'react';
 import NavLink from './NavLink';
-import { Home, List, User, Briefcase, Settings, LogIn, UserPlus, LogOutIcon } from 'lucide-react';
+import { Home, List, User, Briefcase, Settings, LogIn, UserPlus, LogOutIcon, Shield, X } from 'lucide-react';
 import { StoreContext } from '../../context/StoreContext';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +48,7 @@ const Header = ({onNavigate}) => {
           <nav className="space-x-2 sm:space-x-4 flex flex-wrap justify-center items-center">
             <NavLink icon={Home} label="Home" page=""  onNavigate={()=>{onNavigate(''), setShowSettingsCard(false) }}/>
             <NavLink icon={List} label="Tours" page="tours"  onNavigate={()=>{onNavigate('tours'), setShowSettingsCard(false) }}/>
+            <NavLink icon={Shield} label="Admin" page="admin"  onNavigate={()=>{onNavigate('admin'), setShowSettingsCard(false) }} />
             {
               token ? 
               <>
@@ -83,19 +84,19 @@ const Header = ({onNavigate}) => {
       {showSettingsCard && (
         
                   <div
-                  style={{ position: 'fixed', top: '100px', right: '20px', zIndex: 2 }}
+                  style={{ position: 'fixed', top: '120px', right: '20px', zIndex: 2 }}
                     className=" bg-white text-black shadow-lg rounded-lg p-4 w-64"
-                   
                   >
-                    {}
-                    <h3 className="font-bold text-lg mb-2">Settings</h3>
+                    <div style={{display:"flex",justifyContent:"space-between"}}>
+                    <h3 className="font-bold text-lg mb-2 hidden sm:inline">Settings</h3>
+                    <X onClick={()=>setShowSettingsCard(false)} /></div>
                     <div className="space-y-2">
-                      <button
+                      {/* <button
                         className="w-full text-left px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
                         onClick={() => alert('Theme preference clicked')}
                       >
                         Theme Preference
-                      </button>
+                      </button> */}
                       <button
                         className=" flex w-full text-left px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
                         onClick={() => {localStorage.removeItem('token'); localStorage.removeItem('userData'); onNavigate('login'); navigate('/'); window.location.reload()}}

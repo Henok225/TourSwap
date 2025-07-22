@@ -1,9 +1,10 @@
 // import React from 'react'
 import axios from 'axios';
-import { Home, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award, Link2, Clock, Tag } from 'lucide-react';
+import { Home, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award, Link2, Clock, Tag, UserCircle2 } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
+import SmallLoadingSpinner from '../loaderSpin/SmallLoader';
 
 
 const TourListingPage = ({ onNavigate }) => {
@@ -43,7 +44,7 @@ const TourListingPage = ({ onNavigate }) => {
           setFilteredTours(response.data.tours);
           setServerResponse(response.data.message || 'Tours fetched successfully');
           setLoadSuccess(true);
-          console.log('Tours fetched successfully:');
+          console.log('Tours fetched successfully:',response.data.tours);
         })
         .catch(error => {
           console.error('Error fetching tours:', error)
@@ -54,53 +55,53 @@ const TourListingPage = ({ onNavigate }) => {
       console.log('Server Response:', serverResponse);
     }, []);
 
-    useEffect(()=>{
-      // const options = {
-      //   method: 'GET',
-      //   url: 'https://world-tourist-attractions-api.p.rapidapi.com/state',
-      //   headers: {
-      //     'x-rapidapi-key': '408ea1d5afmsh40df0fafe72f2bep1f123fjsn3d517c12bcb1',
-      //     'x-rapidapi-host': 'world-tourist-attractions-api.p.rapidapi.com'
-      //   }
-      // };
+    // useEffect(()=>{
+    //   // const options = {
+    //   //   method: 'GET',
+    //   //   url: 'https://world-tourist-attractions-api.p.rapidapi.com/state',
+    //   //   headers: {
+    //   //     'x-rapidapi-key': '408ea1d5afmsh40df0fafe72f2bep1f123fjsn3d517c12bcb1',
+    //   //     'x-rapidapi-host': 'world-tourist-attractions-api.p.rapidapi.com'
+    //   //   }
+    //   // };
       
-      // async function fetchData() {
-      //   try {
-      //     const response = await axios.request(options);
-      //     console.log(response.data);
-      //   } catch (error) {
-      //     console.error(error);
-      //   }
-      // }
+    //   // async function fetchData() {
+    //   //   try {
+    //   //     const response = await axios.request(options);
+    //   //     console.log(response.data);
+    //   //   } catch (error) {
+    //   //     console.error(error);
+    //   //   }
+    //   // }
       
-      // fetchData();
+    //   // fetchData();
     
       
 
-      const options = {
-        method: 'GET',
-        url: 'https://global-travel-data-api.p.rapidapi.com/live-flights',
-        params: {country: 'Germany'},
-        headers: {
-          'x-rapidapi-key': '4f23d46efamsha6385b13fc91306p14cbf2jsna527df27137e',
-          'x-rapidapi-host': 'global-travel-data-api.p.rapidapi.com'
-        }
-      };
+    //   const options = {
+    //     method: 'GET',
+    //     url: 'https://global-travel-data-api.p.rapidapi.com/live-flights',
+    //     params: {country: 'Germany'},
+    //     headers: {
+    //       'x-rapidapi-key': '4f23d46efamsha6385b13fc91306p14cbf2jsna527df27137e',
+    //       'x-rapidapi-host': 'global-travel-data-api.p.rapidapi.com'
+    //     }
+    //   };
       
-      async function fetchData() {
-        try {
-          const response = await axios.request(options);
-          console.log(response.data);
-          setExternalData(response.data)
-        } catch (error) {
-          console.error(error);
-        }
-      }
+    //   async function fetchData() {
+    //     try {
+    //       const response = await axios.request(options);
+    //       console.log(response.data);
+    //       setExternalData(response.data)
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   }
       
-      fetchData();
+    //   fetchData();
     
       
-    },[])
+    // },[])
 
     
 
@@ -170,7 +171,7 @@ const TourListingPage = ({ onNavigate }) => {
         {/* Tours Listing */}
         {
           loading ? (
-            <div className="text-center text-gray-600 text-xl">Loading tours...</div>
+            <SmallLoadingSpinner/>
           ) : (
             <>
             {
@@ -181,6 +182,10 @@ const TourListingPage = ({ onNavigate }) => {
               <img src={tour.imageUrl} alt={tour.title} className="w-full h-52 object-cover rounded-t-2xl" />
               <div className="p-6">
                 <h4 className="text-2xl font-semibold text-gray-800 mb-3">{tour.title}</h4>
+                <div style={{float:"right"}} className="flex items-center gap-2 text-base font-medium text-gray-700">
+      <UserCircle2 className="w-5 h-5 text-blue-600" />
+      <p className="capitalize">{tour.providerName}</p>
+    </div>
                 <p className="text-gray-600 mb-2 flex items-center"><MapPin size={18} className="mr-2 text-blue-500" /> {tour.location}</p>
                 <p className="text-gray-600 mb-4 flex items-center"><Award size={18} className="mr-2 text-yellow-500" /> {tour.rating} Stars</p>
                 <div className="flex justify-between items-center">

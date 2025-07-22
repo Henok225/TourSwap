@@ -11,7 +11,7 @@ import TravelerReviewsSection from './SubmitReview';
 
 const TravelerDashboard = ({ onNavigate }) => {
 
-    const {url,token,userData} = useContext(StoreContext)
+    const {url,token,userData, toReadableDate} = useContext(StoreContext)
     const [bookedTours,setBookedTours] = useState([
       { id: 101, name: 'Paris City Break', date: '2025-09-15', status: 'Confirmed' },
       { id: 102, name: 'Rome Historical Tour', date: '2025-11-20', status: 'Pending' },
@@ -19,10 +19,10 @@ const TravelerDashboard = ({ onNavigate }) => {
     ]);
     const [bookingLoad,setBookingLoad] = useState(false)
   
-    const swapRequests = [
-      { id: 201, tourName: 'Bali Retreat', status: 'Incoming', requester: 'Jane Doe', date: '2025-10-05' },
-      { id: 202, tourName: 'Thailand Beaches', status: 'Outgoing', recipient: 'John Smith', date: '2025-09-25' },
-    ];
+    // const swapRequests = [
+    //   { id: 201, tourName: 'Bali Retreat', status: 'Incoming', requester: 'Jane Doe', date: '2025-10-05' },
+    //   { id: 202, tourName: 'Thailand Beaches', status: 'Outgoing', recipient: 'John Smith', date: '2025-09-25' },
+    // ];
   
 
     // Fetching recent bookings
@@ -46,15 +46,6 @@ const TravelerDashboard = ({ onNavigate }) => {
 
     },[])
 
-    // changing the ISO date to regular
-    const toReadableDate = (dateString)=>{
-
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      const formated = new Date(dateString).toLocaleDateString('en-US', options);
-
-      return formated;
-
-    }
   
     return (
       <div className="container mx-auto p-6">

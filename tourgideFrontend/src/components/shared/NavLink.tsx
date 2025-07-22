@@ -5,14 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
 
 
-const NavLink = ({ icon: Icon, label, page,onNavigate }) => {
+const NavLink = ({ icon: Icon, label, page }) => {
   const { currentPage, setCurrentPage } = useContext(StoreContext);
     const isActive = currentPage === page;
     const navigate = useNavigate();
 
     return (
       <button
-        onClick={() => {navigate('/' + page), onNavigate(page); setCurrentPage(page); localStorage.setItem("currentPage", page)}}
+        onClick={() => {navigate('/' + page),  setCurrentPage(page); localStorage.setItem("currentPage", page)}}
         className={`flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-300 text-sm md:text-base
           ${isActive ? 'bg-white text-blue-700 shadow-lg transform scale-105 font-semibold' : 'text-white hover:bg-blue-600 hover:text-white font-medium'}`}
       >
