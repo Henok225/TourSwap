@@ -73,7 +73,9 @@ const Booking = ({setBooking}) => {
       hotelClass,
       additionalRequests,
       providerId: tourInView.providerId._id, 
-      userId: userData.userId,         
+      price:tourInView.price,
+      userId: userData.userId,
+
     };
 
     await createBooking(payload);

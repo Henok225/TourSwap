@@ -45,11 +45,11 @@ const LoginPage = ({ onNavigate }) => {
           setToken(response.data.token);
           setUserData(response.data.data);
           setServerResponse(response.data.message)
-          
+          navigate('/');
         }
         setServerResponse(response.data.message)
         console.log(response.data.message)
-        navigate('/');
+       
          
       } catch (error) {
   

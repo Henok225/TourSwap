@@ -49,6 +49,8 @@ const tourSchema = new mongoose.Schema({
   providerName:{type: String, required: true},
   price:{type: Number,required: true},
   imageUrl: { type: String },
+  includes: { type: String, required: false },
+  excludes: { type: String, required: false },
   description: { type: String, required: true },
   rating: { type: Number, default: 0, min: 0, max: 5 },
   status: {

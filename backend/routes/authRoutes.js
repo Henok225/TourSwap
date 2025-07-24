@@ -34,16 +34,17 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
 
     console.log("User found:", user ? user.name : "No user found with that email");
-    if (!user) return res.status(404).json({success:false, message: "User not found" });
+    if (!user) return res.status(200).json({success:false, message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
   
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ userId: user._id, role: user.role, email:user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
     const data = {
       username: user.name,
        role: user.role, 
-       userId: user._id
+       userId: user._id,
+       email: user.email
     }
  
     

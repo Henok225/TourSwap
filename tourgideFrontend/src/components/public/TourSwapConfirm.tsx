@@ -50,14 +50,15 @@ const SwapConfirmationModal = ({ isOpen, onClose, requestedTour, myBookedTours, 
             bookingId: offeredTourBooking._id, // The specific booking ID
             title: offeredTourBooking.tourId.title,
             date: offeredTourBooking.updatedAt,
-            price: offeredTourBooking.price || '$XXX' 
+            price: offeredTourBooking.price
           },
           // The tour the requester wants (the one they clicked on)
           requestedTour: {
             id: requestedTour._id, // The general tour ID from the listing
             title: requestedTour.title,
             location: requestedTour.location,
-            price: requestedTour.price
+            price: requestedTour.price,
+            date:requestedTour.updatedAt
           },
           message: message,
         };

@@ -72,10 +72,14 @@ const AgencyDashboard = ({ onNavigate }) => {
         const currentBookings = async ()=>{
           
           try {
-            const response = await axios.get(url+"/api/bookings/provider/"+userData.userId);
+            const response = await axios.get(url+"/api/bookings/provider/"+userData.userId,{
+              headers: {
+
+                Authorization: `Bearer ${token}`,
+              }
+            });
             if(response.data.success){
             setRecentBooking(response.data.booking)
-            console.log(response.data.booking)
             setBookingLoad(true)
             }
             

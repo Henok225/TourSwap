@@ -7,17 +7,44 @@ import Booking from '../dashboard/Booking';
 import SwapConfirmationModal from './TourSwapConfirm';
 import axios from 'axios';
 import TourReviewsSection from './TourReviews';
+import CustomAlert from '../prompts/AlertPrompt';
 
 
 const TourDetailsPage = ({ tourId, onNavigate }) => {
     
-  const { url,token, tourInView, bookingLoad, bookedTours } = useContext(StoreContext);
+  const { url,token, tourInView, bookedTours, bookingLoad } = useContext(StoreContext);
+  // const [bookedTours, setBookedTours] = useState([])
+  // const [bookingLoad, setBookingLoad] = useState(false)
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [serverResponse, setServerResponse] = useState<string | null>(null);
   const [booking, setBooking] = useState(false)
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertTitle, setAlertTitle] = useState('Heads Up!');
+  const [alertType, setAlertType] = useState('info');
+  const [alertDuration, setAlertDuration] = useState(0); // 0 for no auto-close
+
+  const showAlert = (message, title = 'Notification', type = 'info', duration = 0) => {
+    setAlertMessage(message);
+    setAlertTitle(title);
+    setAlertType(type);
+    setAlertDuration(duration);
+    setIsAlertOpen(true);
+  };
+
+  const closeAlert = () => {
+    setIsAlertOpen(false);
+    setAlertMessage(''); // Clear message when closing
+  };
+
+ 
+
+ 
+ 
   const handleSwapConfirm = async (swapData) => {
     // This is where you'd send the swap request to your backend
     try {
@@ -27,11 +54,16 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
        }});
       if(response.data.success){
         console.log("swap request has been sent successfully!")
+  
       }
+      setServerResponse(response.data.message)
+      showAlert(response.data.message, "Notification", "info")
+      console.log(response.data.message)
     
      } catch (error) {
-      console.error("Failed to send swap request (simulated):", error);
+      console.error("Failed to send swap request):", error);
       throw new Error("Failed to send swap request."); 
+      showAlert("Failed to send swap request", "Message", "error")
     }
   };
     // const tour = {
@@ -66,14 +98,17 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
         { id: 2, author: 'Bob The Builder', rating: 4, comment: 'A truly unique experience. A bit humid, but worth it! The eco-lodge was comfortable and the food was surprisingly good.' },
         { id: 3, author: 'Charlie Chaplin', rating: 5, comment: 'Incredible journey! Every day was an adventure. Highly recommend for nature lovers.' },
       ]
-
+     
     };
+    const tourIncludes = tour.includes ? tour.includes.split(",") : null;
+    const tourExcludes = tour.excludes ? tour.excludes.split(",") : null;
+
   
     if (!tour) {
       return <div className="container mx-auto p-6 text-center text-red-500 text-xl font-semibold">Tour not found.</div>;
     }
 
-    const myBookedTours = bookedTours;
+    const myBookedToursForSwap = bookedTours.filter(book => book.status === "Confirmed");
 
     useEffect(() => {
       window.scrollTo(0, 0); // Scrolls to the top-left corner of the window
@@ -111,7 +146,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
                 tour.excludes ? <div>
                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center"><PlusCircle size={24} className="mr-3 text-green-600" /> What's Included</h3> 
                  <ul className="list-disc list-inside text-gray-700 space-y-3 pl-4">
-                  {tour?.includes.map((item, index) => <li key={index} className="text-lg">{item}</li>)}
+                  {tourIncludes.map((item, index) => <li key={index} className="text-lg">{item}</li>)}
                 </ul> 
               </div>:null}
 
@@ -119,7 +154,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
                 tour.excludes ? <div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center"><Trash2 size={24} className="mr-3 text-red-600" /> What's Excluded</h3>
                  <ul className="list-disc list-inside text-gray-700 space-y-3 pl-4">
-                  {tour.excludes.map((item, index) => <li key={index} className="text-lg">{item}</li>)}
+                  {tourExcludes.map((item, index) => <li key={index} className="text-lg">{item}</li>)}
                 </ul> 
               </div>:null}
             </div> 
@@ -177,8 +212,16 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
         isOpen={isSwapModalOpen}
         onClose={() => setIsSwapModalOpen(false)}
         requestedTour={tour} // The tour user wants to swap for
-        myBookedTours={myBookedTours} // User's own booked tours
+        myBookedTours={myBookedToursForSwap} // User's own booked tours
         onConfirmSwap={handleSwapConfirm} // Function to send data to backend
+      />
+      <CustomAlert
+        isOpen={isAlertOpen}
+        message={alertMessage}
+        title={alertTitle}
+        type={alertType}
+        onClose={closeAlert}
+        duration={alertDuration}
       />
       </>
     );

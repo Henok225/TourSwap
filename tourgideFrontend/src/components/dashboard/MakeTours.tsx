@@ -4,7 +4,7 @@ import LoaderSpin from '../loaderSpin/Loader';
 import { StoreContext } from '../../context/StoreContext';
 
 const MakeTours = ({setMakeTour}) => {
-  const { url, userData } = useContext(StoreContext);
+  const { url, userData, token } = useContext(StoreContext);
   const [newTour, setNewTour] = useState({
     title: '',
     location: '',
@@ -12,6 +12,8 @@ const MakeTours = ({setMakeTour}) => {
     availability: 1,
     price: 0,
     imageUrl: '',
+    includes: '',
+    excludes:'',
     description: '',
     providerId:userData.userId || '',
     providerName: userData.username || '',
@@ -26,7 +28,12 @@ const MakeTours = ({setMakeTour}) => {
     setMessage('');
     try {
      
-      const response = await axios.post(url+'/api/tours/submit', tourData);
+      const response = await axios.post(url+'/api/tours/submit', tourData, {
+        headers: {
+
+          Authorization: `Bearer ${token}`,
+        }
+      });
 
       setMessage(response.data.message || 'Tour submitted successfully!');
     } catch (err) {
@@ -59,6 +66,8 @@ const MakeTours = ({setMakeTour}) => {
       availability: 1,
       price: 0,
       imageUrl: '',
+      includes: '',
+      excludes: '',
       description: '',
       providerId: userData.userId || '',
       providerName: userData.username || '',
@@ -114,11 +123,11 @@ const MakeTours = ({setMakeTour}) => {
             </div>
             <div>
               <label htmlFor="includes" className="block text-gray-700 text-sm font-medium mb-2">What's included: </label>
-              <input type="text" id="includes" name="includes" placeholder='hotel, transport, ...' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.imageUrl} onChange={handleChange} required />
+              <input type="text" id="includes" name="includes" placeholder='hotel, transport, ...' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.includes} onChange={handleChange} required />
             </div>
             <div>
               <label htmlFor="excludes" className="block text-gray-700 text-sm font-medium mb-2">What's excluded: </label>
-              <input type="text" id="excludes" name="excludes" placeholder='dining, shopping, ... ' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.imageUrl} onChange={handleChange} required />
+              <input type="text" id="excludes" name="excludes" placeholder='dining, shopping, ... ' className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" value={newTour.excludes} onChange={handleChange} required />
             </div>
             <div>
               <label htmlFor="availability" className="block text-gray-700 text-sm font-medium mb-2">Availability:</label>

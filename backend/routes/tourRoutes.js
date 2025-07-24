@@ -7,10 +7,10 @@ const router = express.Router();
 
 // 🔹 Submit a tour (protected - provider only)
 router.post("/submit", verifyToken, async (req, res) => {
-  console.log("📦 Incoming body:", req.body);
+  // console.log("📦 Incoming body:", req.body);
   try {
     const newTour = {
-      ...req.body,
+      ...req.body, //not safe to do
       providerId: req.body.providerId,
       providerName: req.body.providerName,
     };

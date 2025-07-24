@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useParams, useNavigate, Navigate } from 'react-router-dom';
 // import { Home, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award } from 'lucide-react';
 import Header from './components/shared/Header';
 // import NavLink from './components/shared/NavLink';
@@ -20,8 +20,9 @@ import DashboardApp from './AdminPanel/MainPage/MainAdminPage';
 const App = () => {
   // const [currentPage, setCurrentPage] = useState(useParams().page); // Default to 'home' if no page is specified
   const [currentTourId, setCurrentTourId] = useState(null);
-  const {token} = useContext(StoreContext);
+  const {token, expiredToken} = useContext(StoreContext);
 
+  // const navigate = useNavigate();
   const handleNavigate = (page, params = {}) => {
     // setCurrentPage(page);
     if (page === 'tour-details' && params.tourId) {
@@ -30,6 +31,8 @@ const App = () => {
       setCurrentTourId(null);
     }
   };
+
+ 
 
   // const renderPage = () => {
   //   switch (currentPage) {
@@ -65,6 +68,7 @@ const App = () => {
 <BrowserRouter> {/* Wrap your entire app with BrowserRouter */}
         <Header  onNavigate={handleNavigate}/> {/* Header can use Link components or useNavigate */}
         <main className="flex-grow py-0">
+
           <Routes> {/* Define your routes here */}
             <Route path="/" element={<HomePage onNavigate={handleNavigate} />} />
             <Route path="/tours" element={<TourListingPage onNavigate={handleNavigate}/>} />
@@ -76,6 +80,7 @@ const App = () => {
             <Route path='/admin' element={<DashboardApp onNavigate={handleNavigate} />} /> {/* Admin dashboard route */}
             {/* Fallback route for 404 */}
             <Route path="*" element={<HomePage onNavigate={handleNavigate} />} /> {/* Or a dedicated 404 page */}
+           
           </Routes>
         </main>
         <Footer />

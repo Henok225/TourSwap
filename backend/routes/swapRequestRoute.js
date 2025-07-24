@@ -6,6 +6,7 @@ import TourSwap from "../models/SwapRequest.js";
 import authMiddleware from "../middlewear/auth.js";
 import User from "../models/User.js";
 import verifyToken from "../middlewear/verifyToken.js";
+import mongoose from "mongoose";
 
 
 const router = express.Router();
@@ -13,7 +14,7 @@ const router = express.Router();
 
   // outgoing
   router.post("/outgoing",verifyToken, async (req, res) => {
-    console.log("swap requested")
+    // console.log("swap requested")
     const { offeredTour, requestedTour, message, requesterId, requesterName } = req.body;
     const currentUserId = req.user.userId;
     const currentUserName = req.user.name;
@@ -28,6 +29,7 @@ const router = express.Router();
     }
 
     try {
+      
       const requesterBooking = await Booking.findOne({
         _id: offeredTour.bookingId,
         userId: requesterId,
@@ -46,10 +48,14 @@ const router = express.Router();
       })
      
       if(prevRequests.length != 0){
-        return res.status(400).json({ success: false, message: "You've already requested this tour before!" });
+         return res.status(200).json({ success: false, message: "You've already requested this tour before. it's pending now!" });
      
       }
-
+      const odyBooked = await Booking.find({userId:currentUserId, tourId:requestedTour.id});
+      if(odyBooked){
+        return res.status(200).json({ success: false, message: "You've already booked this tour!" });
+     
+      }
 
       const potentialTargetBookings = await Booking.find({
         tourId:{_id: requestedTour.id},
@@ -121,7 +127,6 @@ const router = express.Router();
   router.get('/incoming/:userId', verifyToken, async (req, res) => {
     // const currentUserId = req.user.id; // Get authenticated user's ID from middleware
   const {userId} = req.params;
-    console.log(`--- Received GET /api/swap-requests/incoming for user: --`);
     if(userId != req.user.userId){
       return res.status(400).json({ success: false, message: "Error: Unauthorized user!." });
      
@@ -154,7 +159,7 @@ const router = express.Router();
          }
       }
   
-      console.log(`Found ${incomingSwap.length} incoming swap requests for user ${userId}.`);
+      // console.log(`Found ${incomingSwap.length} incoming swap requests for user ${userId}.`);
   
       res.status(200).json({
         success: true,
@@ -168,6 +173,98 @@ const router = express.Router();
       res.status(500).json({ success: false, message: 'Server error: Could not fetch incoming swap requests.' });
     }
   });
+
+  router.put('/accept-request', verifyToken, async (req, res) => {
+    const {swapId} = req.body;
+    const userId = req.user.userId;
+
+    // const session = await mongoose.startSession();
+    // session.startTransaction();
+
+    try {
+
+      const swap = await TourSwap.findById(swapId);
+      
+      if(!swap){
+        res.status(400).json({success:false, message:"swap doesn't exist!"})
+      }
+      const requesterId = swap.requester.userId;
+      const offeredBookId = swap.offeredTour.bookingId;
+      const tourId = swap.requestedTour.id
+      const requestedBooking = await Booking.findOne({userId,tourId})
+      const offeredBooking = await Booking.findById(offeredBookId)
+
+      if(!requestedBooking){
+        res.status(200).json({success:false, message:"Requested booking doesn't exist!"})
+       }
+       if(!offeredBooking){
+        res.status(200).json({success:false, message:"Offered booking doesn't exist!"})
+       }
+
+      //  updating bookings ( updating only the booking date, payment receit, tourId exchanging between the two bookings
+      
+      // 1. Swap user ownership of the bookings
+      requestedBooking.userId = offeredBooking.userId; // Requester's booking now belongs to recipient
+      offeredBooking.userId = userId; // Recipient's booking now belongs to requester
+
+       // 2. Swap tour IDs (the tours themselves)
+       requestedBooking.tourId = offeredBooking.tourId;// Requester's booking now belongs to recipient
+       offeredBooking.tourId = requestedBooking.tourId; // Recipient's booking now belongs to requester
+ 
+       // 3. Swap other relevant booking details like dates and payment receipts
+       requestedBooking.paymentReceipt = offeredBooking.paymentReceipt;// Requester's booking now belongs to recipient
+       offeredBooking.paymentReceipt = requestedBooking.paymentReceipt; // Recipient's booking now belongs to requester
+ 
+       // Save the updated bookings
+       await requestedBooking.save();
+       await offeredBooking.save();
+
+       // Update the swap request status to 'Accepted'
+       swap.status = 'Accepted';
+       await swap.save();
+
+       // Commit the transaction
+      //  await session.commitTransaction();
+      //  session.endSession();
+
+       res.status(200).json({
+        success: true,
+        message: "Swap request accepted successfully! Bookings have been exchanged.",
+        });
+      
+    } catch (error) {
+      console.log("Serever error during accepting swap request",error)
+      res.status(500).json({ success: false, message: 'Server error: Could not accept incoming swap requests.' });
+   
+    }
+  })
+
+  // ✅ DELETE a swap request
+// router.delete("/remove/:swapId", verifyToken, async (req, res) => {
+//   const { swapId } = req.params;
+
+//   try {
+//     const swap = await SwapRequest.findById(swapId);
+//     console.log(swap)
+//     if (!swap) return res.status(404).json({ message: "Swap not found" });
+//     // const swapId = swap.forEach(async element => {
+//     //   await SwapRequest.findByIdAndDelete(element._id, (err, doc) => {
+//     //     if (err) {
+//     //       console.error(err);
+//     //     } else if (doc) {
+//     //       console.log('Document deleted successfully:', doc);
+//     //     } else {
+//     //       console.log('No document found with that ID.');
+//     //     }
+//     //   });
+//     // });
+//     await swap.deleteOne();
+//     res.status(200).json({ message: "Swap deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting Swap:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
 
 
   export default router;

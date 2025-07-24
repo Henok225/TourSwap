@@ -12,6 +12,7 @@ const TravelerSwapRequestsSection = () => {
   const [swapFetchingMessage,setSwapFetchingMessage] = useState('')
   const myBookedTours = bookedTours;
   const [allSwapRequests,setAllSwapRequest] = useState( []);
+  const [updateSwapRequest,setUpdateSwapRequest] = useState(false)
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -32,7 +33,7 @@ const TravelerSwapRequestsSection = () => {
     setAlertMessage(''); // Clear message when closing
   };
   
-  // fetching all swap requests
+  // fetching all swap requests that matches my booked tours
   useEffect(()=>{
    
    const fetchingSwaps = async ()=>{
@@ -48,10 +49,9 @@ const TravelerSwapRequestsSection = () => {
       if(response.data.success){
         setAllSwapRequest(response.data.requests)
        }
+       console.log(response.data.requests)
        setSwapFetchingMessage(response.data.message)
       setLoadingSwaps(false);
-      console.log(response.data.message, response.data.requests)
-      console.log(allSwapRequests)
     } catch (error) {
       console.log("Server error: " + error);
       setSwapFetchingMessage("Server error: couldn't fetch swap requests!")
@@ -61,7 +61,7 @@ const TravelerSwapRequestsSection = () => {
    fetchingSwaps();
    
 
-  },[])
+  },[updateSwapRequest])
   
 
 
@@ -80,20 +80,35 @@ const TravelerSwapRequestsSection = () => {
   // });
 
   // Placeholder functions for actions
-  const handleAccept = (requestId) => {
-    console.log(`Accepted swap request: ${requestId}`);
+  const handleAccept = async (requestId) => {
+
+    try {
+      const response = await axios.put(url+"/api/swap/accept-request", {swapId:requestId},{
+        headers:{
+          'Authorization': 'Bearer '+token
+        }
+      })
+      if(response.data.success){
+      showAlert(response.data.message, "Notification", "info")
+      setUpdateSwapRequest(!updateSwapRequest);
+      }
+      
+    } catch (error) {
+      console.log("couldn't update accept status")
+    }
+    // console.log(`Accepted swap request: ${requestId}`);
     // In a real app, you would send an API call to update status and re-fetch data
   };
 
-  const handleReject = (requestId) => {
-    console.log(`Rejected swap request: ${requestId}`);
-    // In a real app, you would send an API call to update status and re-fetch data
-  };
+  // const handleReject = (requestId) => {
+  //   console.log(`Rejected swap request: ${requestId}`);
+  //   // In a real app, you would send an API call to update status and re-fetch data
+  // };
 
-  const handleCancel = (requestId) => {
-    console.log(`Cancelled outgoing swap request: ${requestId}`);
-    // In a real app, you would send an API call to update status and re-fetch data
-  };
+  // const handleCancel = (requestId) => {
+  //   console.log(`Cancelled outgoing swap request: ${requestId}`);
+  //   // In a real app, you would send an API call to update status and re-fetch data
+  // };
 
   const handleMessage = (userName) => {
      showAlert(`Couldn't open chat with user: ${userName}`, "Notification","info")
@@ -182,12 +197,13 @@ const TravelerSwapRequestsSection = () => {
                     >
                       <CheckCircle size={16} className="mr-1 sm:mr-2" /> Accept
                     </button>
-                    <button
+
+                    {/* <button
                       onClick={() => handleReject(request._id)}
                       className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300 font-medium shadow-md flex items-center justify-center text-sm"
                     >
                       <XCircle size={16} className="mr-1 sm:mr-2" /> Reject
-                    </button>
+                    </button> */}
                     
                     
                        <button

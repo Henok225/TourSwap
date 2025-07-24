@@ -44,8 +44,7 @@ const TourListingPage = ({ onNavigate }) => {
           setFilteredTours(response.data.tours);
           setServerResponse(response.data.message || 'Tours fetched successfully');
           setLoadSuccess(true);
-          console.log('Tours fetched successfully:',response.data.tours);
-        })
+           })
         .catch(error => {
           console.error('Error fetching tours:', error)
           setServerResponse('Error fetching tours');
