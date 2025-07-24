@@ -59,7 +59,8 @@ const tourSchema = new mongoose.Schema({
     default: "Draft",
   },
   bookings: {type: Number, default: 0},
-  review:{type:ReviewSchema, required:false}
+  review:{type:ReviewSchema, required:false},
+  // featured:{type:Boolean,default:false, required:false}
 
 });
 

@@ -3,6 +3,7 @@ import express from "express";
  import verifyToken from "../middlewear/verifyToken.js";
 import Review from "../models/Review.js";
 import Booking from "../models/Booking.js";
+import updateTourAverageRating from "../utils/tourRatingUtils.js";
 const router = express.Router();
 
 // 🔹 Submit a tour (protected - provider only)
@@ -28,6 +29,12 @@ router.get("/", async (req, res) => {
   try {
     const toursO = await Tour.find().populate("providerId", "name email");
     const tours = toursO.filter(tur=>tur.status === "Active");
+
+    // updating rating for each tour
+    toursO.forEach(tur=>{
+      updateTourAverageRating(tur._id);
+    })
+
     res.status(200).json({success:true,tours});
   } catch (error) {
     console.error("Error getting tours:", error.message);
@@ -38,8 +45,11 @@ router.get("/", async (req, res) => {
 // 🔹 Get all tours (Admin)
 router.get("/admin",verifyToken, async (req, res) => {
   try {
+
+
+
     const tours = await Tour.find().populate("providerId", "name email");
-  
+    
     res.status(200).json({success:true,tours});
   } catch (error) {
     console.error("Error getting tours:", error.message);
@@ -121,7 +131,7 @@ router.post('/reviews', verifyToken, async (req, res) => {
   const { tourId, rating, comment } = req.body;
   const userId = req.user.userId; // Get user ID from authenticated request
   console.log("review sent request")
-  // Basic input validation
+
   if (!tourId || !rating) {
     console.log("rating problem")
     
@@ -138,14 +148,14 @@ router.post('/reviews', verifyToken, async (req, res) => {
   
 
   try {
-    // Optional: Validate if the tourId actually exists in your Tour collection
+    
     const tourExists = await Tour.findOne({_id:tourId});
     if (!tourExists) {
       console.log("tour isn't here  : "+ tourId)
       return res.status(404).json({ success: false, message: 'Tour not found.' });
     }
 
-    // Optional: Check if the user has already reviewed this tour (if your schema has unique:true on tourId+userId)
+    //  Check if the user has already reviewed this tour (if your schema has unique:true on tourId+userId)
     const existingReview = await Review.findById(userId);
     if (existingReview) {
       console.log("you already submited")
@@ -161,12 +171,16 @@ router.post('/reviews', verifyToken, async (req, res) => {
       status: 'pending' // Or 'approved' if no moderation is needed
     });
 
+    await updateTourAverageRating(tourId);
+
+
     // updating booking status
     const updatedBooking = await Booking.findOneAndUpdate(
       { userId, tourId }, // Query to find the specific booking
       { status: "Reviewed" }, // Update the status field
       { new: true } // Return the updated document
     );
+    
 
     res.status(201).json({
       success: true,

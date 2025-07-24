@@ -23,7 +23,7 @@ const StoreProvider = (props) => {
     const [expiredToken,setExpiredToken] =useState(false)
 
     const [currentPage, setCurrentPage] = useState(localStorage.getItem("currentPage") || "");
-
+    const [featuredTours,setFeaturedTours] = useState(localStorage.getItem("featuredTour"))
     // const navigate = useNavigate();
 
 
@@ -100,7 +100,9 @@ const StoreProvider = (props) => {
         bookingLoad,
         toReadableDate,
         expiredToken,
-        setExpiredToken
+        setExpiredToken,
+        featuredTours,
+        setFeaturedTours
     };
 
     return (

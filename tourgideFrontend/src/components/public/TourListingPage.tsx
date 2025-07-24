@@ -9,7 +9,7 @@ import SmallLoadingSpinner from '../loaderSpin/SmallLoader';
 
 const TourListingPage = ({ onNavigate }) => {
 
-  const { url, setTourInView } = useContext(StoreContext);
+  const { url, setTourInView, featuredTour, setFeaturedTours } = useContext(StoreContext);
   const [loading, setLoading] = useState(true);
   const [loadSuccess, setLoadSuccess] = useState(false);
   const [serverResponse, setServerResponse] = useState<string | null>(null);
@@ -42,6 +42,11 @@ const TourListingPage = ({ onNavigate }) => {
         .then(response => {
           setTours(response.data.tours);
           setFilteredTours(response.data.tours);
+          console.log(response.data.tours)
+          const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4.5)
+          setFeaturedTours(featured_tours)
+          localStorage.setItem("featuredTour", featured_tours)
+
           setServerResponse(response.data.message || 'Tours fetched successfully');
           setLoadSuccess(true);
            })

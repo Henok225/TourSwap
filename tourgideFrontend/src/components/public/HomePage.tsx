@@ -7,13 +7,14 @@ import { StoreContext } from '../../context/StoreContext';
 const HomePage = ({ onNavigate }) => {
 
     const navigate = useNavigate();
-    const featuredTours = [
+    const {setTourInView, featuredTours} = useContext(StoreContext)
+  
+    const featuredTour = featuredTours || [
       { id: 1, name: 'Amazon Rainforest Adventure', location: 'Brazil', price: '$1500', rating: 4.8, imageUrl: 'https://cdn2.rhinoafrica.com/thumbnails/media/_en/destinations/root/africa/east-africa/tanzania/serengeti-and-the-north-of-tanzania/greater-serengeti-ecosystem/serengeti-national-park/_img/gallery/53383/image-thumb__53383__background-cover/field-with-zebras-and-blue-wildebeest_192248950.ed7d5949.jpg' },
       { id: 2, name: 'Kyoto Cherry Blossom Tour', location: 'Japan', price: '$1200', rating: 4.9, imageUrl: 'https://aex-web.imgix.net/getContentAsset/ef7f7138-c9b7-4f1d-bcb3-27fe5be3e673/8e265d97-ee24-47b6-a823-0d8b4ca7c908/Aurora-borealis,-Northern-Lights,-Lofoten-islands,-Norway,-Shutterstock-WEB.jpg?language=en&auto=format&w={width}&fit=cover' },
       { id: 3, name: 'Safari in Serengeti', location: 'Tanzania', price: '$2000', rating: 4.7, imageUrl: 'https://trekthehimalayas.com/images/HomePageImages/Desktop/02efe847-b6f4-49f6-a42b-44997f3c0e46_Himalaya-trek.webp' },
     ];
-    const {setTourInView} = useContext(StoreContext)
-  
+    
     const handleViewDetails = (tourId) => {
       setTourInView(featuredTours.find(tour => tour.id === tourId));
       localStorage.setItem('tourInView', JSON.stringify(featuredTours.find(tour => tour.id === tourId)));
@@ -37,7 +38,7 @@ const HomePage = ({ onNavigate }) => {
         <section className="my-16">
           <h3 className="text-4xl font-bold text-gray-800 mb-10 text-center">Featured Tours</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredTours.map(tour => (
+            {featuredTour.map(tour => (
               <div key={tour.id} className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border border-gray-100">
                 <img src={tour.imageUrl} alt={tour.name} className="w-full h-52 object-cover rounded-t-2xl" />
                 <div className="p-6">
