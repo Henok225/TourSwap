@@ -88,7 +88,6 @@ To simplify the process of offering and booking tours:
 | **Backend** | Node.js + Express.js |
 | **Database**| MongoDB (via Atlas)  |
 | **Auth**    | JWT (JSON Web Token) |
-| **Hosting** | Netlify (Frontend) + Render/Vercel (Backend) |
 
 ---
 
@@ -115,7 +114,7 @@ README.md
 ### Step 1: Clone the project
 
 ```bash
-git clone https://github.com/your-repo/tour-booking-platform.git
+git clone https://github.com/Henok225/TourSwap/tree/main
 cd tour-booking-platform
 ````
 
@@ -143,17 +142,7 @@ JWT_SECRET=your_jwt_secret
 
 ---
 
-## 💡 Deployment
 
-| Service           | Description               |
-| ----------------- | ------------------------- |
-| **Netlify**       | Hosts frontend React app  |
-| **Render**        | Hosts backend Express API |
-| **MongoDB Atlas** | Cloud database            |
-
-You can also choose other providers like Vercel or Railway.
-
----
 
 ## 📦 Future Improvements
 
@@ -167,9 +156,4 @@ You can also choose other providers like Vercel or Railway.
 
 This project is licensed under the MIT License.
 
-```
 
----
-
-Would you like me to generate this as a downloadable PDF or markdown file now?
-```
