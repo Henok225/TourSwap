@@ -1,8 +1,4 @@
-Great clarification! Since this `README.md` is for your **client** to understand the project, and you've mentioned that **tour agents (users) provide the tours**, while **admins only approve them** (not create them), here's a fully revised and polished `README.md` tailored to clearly explain the platform for **your client**:
 
----
-
-```markdown
 # 🌍 Tour Booking Platform
 
 A full-stack tour booking system where travel agents can register and submit tours, users can book tours, and admins manage approvals and monitor activity. This document provides a complete overview of how the platform works.
