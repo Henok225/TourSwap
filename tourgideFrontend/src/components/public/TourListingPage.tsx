@@ -44,7 +44,7 @@ const TourListingPage = ({ onNavigate }) => {
           setFilteredTours(response.data.tours);
           console.log(response.data.tours)
           const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4.5)
-          setFeaturedTours(featured_tours)
+          setFeaturedTours(response.data.tours.filter(ftr=>ftr.rating >= 4.5))
           localStorage.setItem("featuredTour", featured_tours)
 
           setServerResponse(response.data.message || 'Tours fetched successfully');
@@ -162,7 +162,7 @@ const TourListingPage = ({ onNavigate }) => {
             <button onClick={()=>setFilteredTours(()=>{
               return tours.filter(tour => {
                 const matchesLocation = filterdata.location ? tour.location.toLowerCase().includes(filterdata.location.toLowerCase()) : true;
-                const matchesPrice = filterdata.price ? parseFloat(tour.price.replace('$', '')) <= parseFloat(filterdata.price) : true;
+                const matchesPrice = filterdata.price ? parseFloat(tour.price.toString().replace('$', '')) <= parseFloat(filterdata.price) : true;
                 const matchesRating = filterdata.rating ? tour.rating >= parseFloat(filterdata.rating.toString()) : true;
                 return matchesLocation && matchesPrice && matchesRating;
               });

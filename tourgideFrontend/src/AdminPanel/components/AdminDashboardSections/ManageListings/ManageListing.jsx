@@ -50,11 +50,25 @@ const ManageListings = ({adminToken}) => {
       setIsModalOpen(true);
     };
   
-    const confirmDelete = () => {
-      setListings(listings.filter(listing => listing.id !== selectedListing.id));
+    const confirmDelete = async () => {
+      setListings(listings.filter(listing => listing._id !== selectedListing._id));
       setIsModalOpen(false);
       setSelectedListing(null);
-      console.log(`Deleted listing: ${selectedListing.name}`);
+     
+      try {
+        const response = await axios.delete(url+'/api/tours/remove/'+selectedListing._id, {
+          headers:{
+            'Authorization': "Bearer "+adminToken
+          }
+        }); 
+        if (response.data.success) {
+          console.log(`Deleted listing: ${selectedListing.name}`);
+
+        }
+      } catch (error) {
+        console.log("Error dele")
+      }
+
     };
 
     // Handler for when status select changes
