@@ -34,7 +34,7 @@ const TravelerDashboard = ({ onNavigate }) => {
           const response = await axios.get(url+"/api/bookings/user/"+userData.userId);
           
           if(response.data.success){
-          setBookedTours(response.data.booking)
+          setBookedTours(response.data.booking.filter(book=>book.status !== "Reviewed" ))
           setBookingLoad(true)
           }
           
@@ -49,7 +49,7 @@ const TravelerDashboard = ({ onNavigate }) => {
   
     return (
       <div className="container mx-auto p-6">
-        <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center">Traveler Dashboard</h2>
+        <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center">Traveler Dashboard <br/> for <span style={{color:"lightblue"}}>{userData.username}</span> </h2>
   
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Booked Tours */}

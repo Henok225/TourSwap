@@ -9,10 +9,10 @@ import Review from '../models/Review.js'
 async function updateTourAverageRating(tourId) {
     try {
         // 1. Find all approved reviews for the given tourId
-        const reviews = await Review.find({ tourId: tourId, status: 'approved' });
+        const reviews = await Review.find({ tourId: tourId });
 
         console.log(reviews)
-        if (reviews.length === 0) {
+        if (reviews.length == 0) {
             // If no approved reviews, set rating to 0 or null, or handle as appropriate
             await Tour.findByIdAndUpdate(tourId, { rating: 0});
             console.log(`Tour ${tourId}: No approved reviews found. Rating set to 0.`);

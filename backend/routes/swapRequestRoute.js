@@ -14,7 +14,7 @@ const router = express.Router();
 
   // outgoing
   router.post("/outgoing",verifyToken, async (req, res) => {
-    // console.log("swap requested")
+    console.log("swap requested")
     const { offeredTour, requestedTour, message, requesterId, requesterName } = req.body;
     const currentUserId = req.user.userId;
     const currentUserName = req.user.name;
@@ -52,7 +52,8 @@ const router = express.Router();
      
       }
       const odyBooked = await Booking.find({userId:currentUserId, tourId:requestedTour.id});
-      if(odyBooked){
+      if(odyBooked.length != 0){
+        console.log("you've requested", odyBooked)
         return res.status(200).json({ success: false, message: "You've already booked this tour!" });
      
       }
@@ -138,7 +139,7 @@ const router = express.Router();
         userId,
         status:"Confirmed"
       })
-      if(!myBookings){
+      if(myBookings.length == 0){
         res.status(400).json({ message: "You don't have any bookings!" });
     
       }
@@ -153,14 +154,14 @@ const router = express.Router();
       for(let i =0;i<myBookings.length;i++){
        
          for(let j=0;j<incomingRequests.length;j++){
-          if(myBookings[i].tourId == incomingRequests[j].requestedTour.id){
-            incomingSwap.push(incomingRequests[i]);
+          if(myBookings[i].tourId == incomingRequests[j].requestedTour.id.toString()){
+            incomingSwap.push(incomingRequests[j]);
            }
          }
       }
   
-      // console.log(`Found ${incomingSwap.length} incoming swap requests for user ${userId}.`);
-  
+      // console.log(`Found ${incomingSwap} incoming swap requests for user ${userId}.`);
+     
       res.status(200).json({
         success: true,
         message: 'Incoming swap requests fetched successfully.',
@@ -192,7 +193,7 @@ const router = express.Router();
       const offeredBookId = swap.offeredTour.bookingId;
       const tourId = swap.requestedTour.id
       const requestedBooking = await Booking.findOne({userId,tourId})
-      const offeredBooking = await Booking.findById(offeredBookId)
+      const offeredBooking = await Booking.findOne({_id:offeredBookId})
 
       if(!requestedBooking){
         res.status(200).json({success:false, message:"Requested booking doesn't exist!"})
@@ -204,12 +205,12 @@ const router = express.Router();
       //  updating bookings ( updating only the booking date, payment receit, tourId exchanging between the two bookings
       
       // 1. Swap user ownership of the bookings
-      requestedBooking.userId = offeredBooking.userId; // Requester's booking now belongs to recipient
+      requestedBooking.userId = requesterId; // Requester's booking now belongs to recipient
       offeredBooking.userId = userId; // Recipient's booking now belongs to requester
 
        // 2. Swap tour IDs (the tours themselves)
-       requestedBooking.tourId = offeredBooking.tourId;// Requester's booking now belongs to recipient
-       offeredBooking.tourId = requestedBooking.tourId; // Recipient's booking now belongs to requester
+      //  requestedBooking.tourId = offeredBooking.tourId;// Requester's booking now belongs to recipient
+      //  offeredBooking.tourId = requestedBooking.tourId; // Recipient's booking now belongs to requester
  
        // 3. Swap other relevant booking details like dates and payment receipts
        requestedBooking.paymentReceipt = offeredBooking.paymentReceipt;// Requester's booking now belongs to recipient

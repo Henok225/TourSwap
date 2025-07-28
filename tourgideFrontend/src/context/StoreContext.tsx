@@ -16,6 +16,7 @@ const StoreProvider = (props) => {
     });
     const [tourInView, setTourInView] = useState(() => {
         const storedTour = localStorage.getItem("tourInView");
+        console.log(storedTour)
         return storedTour ? JSON.parse(storedTour) : null;
     });
     const [bookedTours, setBookedTours] = useState([])
@@ -23,7 +24,7 @@ const StoreProvider = (props) => {
     const [expiredToken,setExpiredToken] =useState(false)
 
     const [currentPage, setCurrentPage] = useState(localStorage.getItem("currentPage") || "");
-    const [featuredTours,setFeaturedTours] = useState(localStorage.getItem("featuredTour"))
+    const [featuredTours,setFeaturedTours] = useState([])
     // const navigate = useNavigate();
 
 
@@ -72,6 +73,23 @@ const StoreProvider = (props) => {
         currentBookings();
 
     }, [])
+
+    // fetching tours
+    useEffect(() => {
+        axios.get(url+'/api/tours/')
+          .then(response => {
+            const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4)
+            // console.log(response.data.featuredTours)
+            setFeaturedTours(response.data.tours.filter(ftr=>ftr.rating >= 4))
+            // localStorage.setItem("featuredTour", JSON.stringfy(featured_tours))
+  
+             })
+          .catch(error => {
+            console.error('Error fetching tours:', error)
+            
+      });
+        // console.log('Server Response:', serverResponse);
+      }, []);
     
 
      // changing the ISO date to regular

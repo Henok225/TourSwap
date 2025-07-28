@@ -49,7 +49,7 @@ const TravelerSwapRequestsSection = () => {
       if(response.data.success){
         setAllSwapRequest(response.data.requests)
        }
-       console.log(response.data.requests)
+       console.log(response.data)
        setSwapFetchingMessage(response.data.message)
       setLoadingSwaps(false);
     } catch (error) {

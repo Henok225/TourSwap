@@ -27,7 +27,7 @@ const ManageListings = ({adminToken}) => {
           }); 
           if (response.data.success) {
             setListings(response.data.tours); 
-            console.log(response.data.tours)
+            // console.log(response.data.tours)
           }
           
         } catch (error) {

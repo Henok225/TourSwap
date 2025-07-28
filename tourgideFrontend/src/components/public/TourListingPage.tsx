@@ -42,10 +42,11 @@ const TourListingPage = ({ onNavigate }) => {
         .then(response => {
           setTours(response.data.tours);
           setFilteredTours(response.data.tours);
-          console.log(response.data.tours)
+          // console.log(response.data.tours)
           const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4.5)
-          setFeaturedTours(response.data.tours.filter(ftr=>ftr.rating >= 4.5))
-          localStorage.setItem("featuredTour", featured_tours)
+          // console.log(response.data.tours)
+          // setFeaturedTours(response.data.tours.filter(ftr=>ftr.rating >= 4))
+          // localStorage.setItem("featuredTour", JSON.stringfy(featured_tours))
 
           setServerResponse(response.data.message || 'Tours fetched successfully');
           setLoadSuccess(true);

@@ -1,8 +1,9 @@
 // import React from 'react'
-import { Home, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award } from 'lucide-react';
+import { Home,UserCircle2, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award } from 'lucide-react';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/StoreContext';
+import SmallLoadingSpinner from '../loaderSpin/SmallLoader'
 
 const HomePage = ({ onNavigate }) => {
 
@@ -16,12 +17,11 @@ const HomePage = ({ onNavigate }) => {
     ];
     
     const handleViewDetails = (tourId) => {
-      setTourInView(featuredTours.find(tour => tour.id === tourId));
-      localStorage.setItem('tourInView', JSON.stringify(featuredTours.find(tour => tour.id === tourId)));
+      setTourInView(featuredTour.find(tour => tour._id === tourId));
+      localStorage.setItem('tourInView', JSON.stringify(tours.find(tour => tour._id === tourId)));
       navigate('/tours/' + tourId);
       onNavigate('tour-details', { tourId });
     };
-
     return (
       <div className="container mx-auto p-6">
         <section className="text-center my-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-12 rounded-3xl shadow-2xl animate-fade-in-down">
@@ -37,30 +37,41 @@ const HomePage = ({ onNavigate }) => {
   
         <section className="my-16">
           <h3 className="text-4xl font-bold text-gray-800 mb-10 text-center">Featured Tours</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          {
+            !featuredTour || featuredTour.length == 0? 
+            <SmallLoadingSpinner />
+            :
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredTour.map(tour => (
-              <div key={tour.id} className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border border-gray-100">
-                <img src={tour.imageUrl} alt={tour.name} className="w-full h-52 object-cover rounded-t-2xl" />
-                <div className="p-6">
-                  <h4 className="text-2xl font-semibold text-gray-800 mb-3">{tour.name}</h4>
-                  <p className="text-gray-600 mb-2 flex items-center"><MapPin size={18} className="mr-2 text-blue-500" /> {tour.location}</p>
-                  <p className="text-gray-600 mb-4 flex items-center"><Award size={18} className="mr-2 text-yellow-500" /> {tour.rating} Stars</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-blue-700 font-bold text-3xl flex items-center"><DollarSign size={24} className="mr-1" />{tour.price.replace('$', '')}</span>
-                    <button
+            <div key={tour._id} className="bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border border-gray-100">
+              <img src={tour.imageUrl} alt={tour.title} className="w-full h-52 object-cover rounded-t-2xl" />
+              <div className="p-6">
+                <h4 className="text-2xl font-semibold text-gray-800 mb-3">{tour.title}</h4>
+                <div style={{float:"right"}} className="flex items-center gap-2 text-base font-medium text-gray-700">
+      <UserCircle2 className="w-5 h-5 text-blue-600" />
+      <p className="capitalize">{tour.providerName}</p>
+    </div>
+                <p className="text-gray-600 mb-2 flex items-center"><MapPin size={18} className="mr-2 text-blue-500" /> {tour.location}</p>
+                <p className="text-gray-600 mb-4 flex items-center"><Award size={18} className="mr-2 text-yellow-500" /> {tour.rating} Stars</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700 font-bold text-3xl flex items-center"><DollarSign size={24} className="mr-1" />{tour.price.toString().replace('ETB', '')}</span>
+                  <button
                       onClick={() => {
-                         navigate('/tours/'+tour.id);
-                         onNavigate('tour-details', { tourId: tour.id })
-                         handleViewDetails(tour.id);}}
+                         navigate('/tours/'+tour._id);
+                         onNavigate('tour-details', { tourId: tour._id })
+                         handleViewDetails(tour._id);}}
                       className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition duration-300 font-medium shadow-md"
                     >
                       View Details
                     </button>
-                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
           </div>
+          }
+          
         </section>
       </div>
     );
