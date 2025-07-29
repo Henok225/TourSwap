@@ -1,12 +1,12 @@
 import axios from "axios";
-import { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useEffect, useState, type JSXElementConstructor, type ReactElement, type ReactNode, type ReactPortal } from "react";
+// import { useNavigate } from "react-router-dom";
 
 
 
 export const StoreContext = createContext(null);
 
-const StoreProvider = (props) => {
+const StoreProvider = (props: { children: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) => {
 
     const url = "http://localhost:5000";
     const [token, setToken] = useState(localStorage.getItem("token"));
@@ -93,13 +93,38 @@ const StoreProvider = (props) => {
     
 
      // changing the ISO date to regular
-     const toReadableDate = (dateString)=>{
+     const toReadableDate = (dateString: string | number | Date)=>{
 
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const formated = new Date(dateString).toLocaleDateString('en-US', options);
   
         return formated;
   
+      }
+
+      // price format
+      function formatPrice(amount, currency = 'USD', locale = 'en-US') {
+        // Basic validation to ensure the amount is a valid number
+        if (typeof amount !== 'number' || isNaN(amount)) {
+          console.error(`Invalid input for amount: ${amount}. Must be a number.`);
+          return 'Invalid Amount'; // Or throw an error, depending on desired behavior
+        }
+      
+        try {
+          // Create a NumberFormat object with specified locale and currency options
+          const formatter = new Intl.NumberFormat(locale, {
+            style: 'currency',      // Specifies that it's a currency format
+            currency: currency,     // The currency code (e.g., 'USD', 'EUR')
+            minimumFractionDigits: 2, // Ensure at least 2 decimal places
+            maximumFractionDigits: 2  // Ensure no more than 2 decimal places
+          });
+      
+          // Format the amount
+          return formatter.format(amount);
+        } catch (error) {
+          console.error(`Error formatting price for amount ${amount} with currency ${currency} and locale ${locale}:`, error);
+          return 'Formatting Error'; // Generic error message
+        }
       }
 
 
@@ -120,7 +145,8 @@ const StoreProvider = (props) => {
         expiredToken,
         setExpiredToken,
         featuredTours,
-        setFeaturedTours
+        setFeaturedTours,
+        formatPrice
     };
 
     return (

@@ -9,7 +9,7 @@ import SmallLoadingSpinner from '../loaderSpin/SmallLoader';
 
 const TourListingPage = ({ onNavigate }) => {
 
-  const { url, setTourInView, featuredTour, setFeaturedTours } = useContext(StoreContext);
+  const { url, setTourInView, featuredTour, setFeaturedTours, formatPrice } = useContext(StoreContext);
   const [loading, setLoading] = useState(true);
   const [loadSuccess, setLoadSuccess] = useState(false);
   const [serverResponse, setServerResponse] = useState<string | null>(null);
@@ -21,15 +21,15 @@ const TourListingPage = ({ onNavigate }) => {
       price: 0,
       rating: 0
     });
-    const [externalData,setExternalData] = useState([])
+    // const [externalData,setExternalData] = useState([])
 
-    const onFilterChangeHandler = (event) => {
+    const onFilterChangeHandler = (event: { target: { name: any; value: any; }; }) => {h 
       const name = event.target.name;
       const value = event.target.value;
       setFilterData(data => ({ ...data, [name]: value }))
     }
 
-    const handleViewDetails = (tourId) => {
+    const handleViewDetails = (tourId: string) => {
       setTourInView(tours.find(tour => tour._id === tourId));
       localStorage.setItem('tourInView', JSON.stringify(tours.find(tour => tour._id === tourId)));
       navigate('/tours/' + tourId);
@@ -43,7 +43,7 @@ const TourListingPage = ({ onNavigate }) => {
           setTours(response.data.tours);
           setFilteredTours(response.data.tours);
           // console.log(response.data.tours)
-          const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4.5)
+          // const featured_tours = response.data.tours.filter(ftr=>ftr.rating >= 4.5)
           // console.log(response.data.tours)
           // setFeaturedTours(response.data.tours.filter(ftr=>ftr.rating >= 4))
           // localStorage.setItem("featuredTour", JSON.stringfy(featured_tours))
@@ -193,8 +193,8 @@ const TourListingPage = ({ onNavigate }) => {
     </div>
                 <p className="text-gray-600 mb-2 flex items-center"><MapPin size={18} className="mr-2 text-blue-500" /> {tour.location}</p>
                 <p className="text-gray-600 mb-4 flex items-center"><Award size={18} className="mr-2 text-yellow-500" /> {tour.rating} Stars</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-blue-700 font-bold text-3xl flex items-center"><DollarSign size={24} className="mr-1" />{tour.price.toString().replace('ETB', '')}</span>
+                <div className="flex justify-between flex-wrap items-center">
+                  <span className="text-blue-700 font-bold text-3xl flex items-center">{formatPrice(Number(tour.price.toString().replace('ETB', '')), "ETB")}</span>
                   <button
                       onClick={() => {
                          navigate('/tours/'+tour._id);

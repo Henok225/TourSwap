@@ -1,6 +1,6 @@
 // import React from 'react'
-import { Home, List, User, Briefcase, LogIn, UserPlus, BookOpen, Repeat, Star, PlusCircle, Edit, Trash2, Eye, MapPin, DollarSign, Award, Book, UserCircle2 } from 'lucide-react';
-import { useContext, useEffect, useState } from 'react';
+import { List, BookOpen, Repeat, PlusCircle, Trash2, MapPin, Award, UserCircle2 } from 'lucide-react';
+import { useContext, useEffect, useState, type SetStateAction } from 'react';
 import { StoreContext } from '../../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
 import Booking from '../dashboard/Booking';
@@ -12,12 +12,12 @@ import CustomAlert from '../prompts/AlertPrompt';
 
 const TourDetailsPage = ({ tourId, onNavigate }) => {
     
-  const { url,token, tourInView, bookedTours, bookingLoad } = useContext(StoreContext);
+  const { url,token, tourInView, bookedTours, bookingLoad, formatPrice } = useContext(StoreContext);
   // const [bookedTours, setBookedTours] = useState([])
   // const [bookingLoad, setBookingLoad] = useState(false)
 
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [serverResponse, setServerResponse] = useState<string | null>(null);
   const [booking, setBooking] = useState(false)
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
   const [alertType, setAlertType] = useState('info');
   const [alertDuration, setAlertDuration] = useState(0); // 0 for no auto-close
 
-  const showAlert = (message, title = 'Notification', type = 'info', duration = 0) => {
+  const showAlert = (message: SetStateAction<string>, title = 'Notification', type = 'info', duration = 0) => {
     setAlertMessage(message);
     setAlertTitle(title);
     setAlertType(type);
@@ -45,7 +45,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
 
  
  
-  const handleSwapConfirm = async (swapData) => {
+  const handleSwapConfirm = async (swapData: any) => {
     // This is where you'd send the swap request to your backend
     try {
        const response = await axios.post(url+'/api/swap/outgoing', swapData,{
@@ -108,7 +108,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
       return <div className="container mx-auto p-6 text-center text-red-500 text-xl font-semibold">Tour not found.</div>;
     }
 
-    const myBookedToursForSwap = bookedTours.filter(book => book.status === "Confirmed");
+    const myBookedToursForSwap = bookedTours.filter((book: { status: string; }) => book.status === "Confirmed");
 
     useEffect(() => {
       window.scrollTo(0, 0); // Scrolls to the top-left corner of the window
@@ -132,7 +132,7 @@ const TourDetailsPage = ({ tourId, onNavigate }) => {
             
             
             <p className="text-gray-700 text-xl md:text-2xl mb-4 flex items-center"><MapPin size={24} className="mr-3 text-blue-600" /> {tour.location}</p>
-            <p className="text-blue-700 font-bold text-4xl md:text-5xl mb-6 flex items-center"><DollarSign size={32} className="mr-2" />{tour.price.toString().replace('$', '')}</p>
+            <p className="text-blue-700 font-bold text-4xl md:text-5xl mb-6 flex items-center"><span style={{fontSize:"0.8em", color:"red"}}> ETB '</span> <span> {tour.price.toString().replace('$', '')}</span> </p>
             <div className="flex items-center mb-8">
               <Award size={28} className="text-yellow-500 mr-2" />
               <span className="text-gray-800 text-2xl font-semibold">{tour.rating} Stars</span>
